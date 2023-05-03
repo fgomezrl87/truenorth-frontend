@@ -13,19 +13,23 @@ export class CalculatorComponent {
   num1: number = 0;
   currentInput: number | string = 0;
   operation: string = '';
+  userBalance: number = 50;
+  justCalculated: boolean = false;
 
   constructor(private calculatorApiService: CalculatorApiService) { }
 
   onCalculate() {
     if (this.num1 && this.currentInput && this.operation) {
       this.calculatorApiService
-        .calculate(this.num1, Number(this.currentInput), this.operation)
+        .calculate(this.operation, this.num1, Number(this.currentInput), this.userBalance)
         .pipe(
           tap((response) => {
-            this.result = response;
+            this.result = response.result;
+            this.userBalance = response.new_balance;
             this.num1 = 0;
             this.currentInput = 0;
             this.operation = '';
+            this.justCalculated = true;
           }),
           catchError((error: unknown) => {
             console.error('Error:', error);
@@ -35,8 +39,12 @@ export class CalculatorComponent {
         .subscribe();
     }
   }
-   
+
   handleButtonClick(value: string) {
+    if (this.justCalculated && value !== 'clear') {
+      this.justCalculated = false;
+    }
+
     if (!isNaN(Number(value))) {
       // If it's a number
       if (typeof this.currentInput === 'number') {
@@ -47,10 +55,22 @@ export class CalculatorComponent {
     } else {
       switch (value) {
         case 'add':
+          this.operation = 'addition';
+          this.num1 = Number(this.currentInput);
+          this.currentInput = 0;
+          break;
         case 'subtract':
+          this.operation = 'subtraction';
+          this.num1 = Number(this.currentInput);
+          this.currentInput = 0;
+          break;
         case 'multiply':
+          this.operation = 'multiplication';
+          this.num1 = Number(this.currentInput);
+          this.currentInput = 0;
+          break;
         case 'divide':
-          this.operation = value;
+          this.operation = 'division';
           this.num1 = Number(this.currentInput);
           this.currentInput = 0;
           break;
@@ -58,7 +78,13 @@ export class CalculatorComponent {
           this.onCalculate();
           break;
         case 'clear':
-          this.currentInput = 0;
+          if (this.justCalculated) {
+            this.result = 0;
+            this.userBalance = 50;
+          } else {
+            this.currentInput = 0;
+          }
+          this.justCalculated = false;
           break;
         case '.':
           if (typeof this.currentInput === 'number') {
@@ -70,5 +96,4 @@ export class CalculatorComponent {
       }
     }
   }
-  
 }

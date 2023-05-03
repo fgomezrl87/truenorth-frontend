@@ -1,0 +1,12 @@
+<div class="buttons">
+  <div class="row" *ngFor="let row of buttons">
+    <button
+      class="btn"
+      [ngClass]="button.class"
+      *ngFor="let button of row"
+      (click)="onButtonClick(button.value)"
+    >
+      {{ button.label }}
+    </button>
+  </div>
+</div>

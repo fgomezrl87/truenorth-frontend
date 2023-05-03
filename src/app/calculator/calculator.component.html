@@ -1,0 +1,5 @@
+<div class="calculator">
+  <h1>Simple Calculator</h1>
+  <app-screen [result]="result" [currentInput]="currentInput"></app-screen>
+  <app-buttons (buttonClickedEvent)="handleButtonClick($event)"></app-buttons>
+</div>
